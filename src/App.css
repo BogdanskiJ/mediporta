@@ -36,3 +36,31 @@
     transform: rotate(360deg);
   }
 }
+
+
+.tableRowExpanded{
+height: 400px;
+background: lightgrey;
+}
+
+.tableRowExpanded__outerBox{
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+height: 100%;
+}
+
+.tableRowExpanded__buttonsBox{
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+}
+
+.tableRowExpanded__data{
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+}
