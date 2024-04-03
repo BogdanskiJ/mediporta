@@ -16,16 +16,43 @@ const tagsBrowser = createSlice({
     dateFrom: null,
     dateTo: null,
     selectedTag: null,
+    dataFaq: null,
+    dataRel: null,
+    dataSyn: null,
+    dataType: "dataFaq",
+    showMenu: true,
   },
   reducers: {
     fetchDataRequest: (state, { payload: data }) => {
       state.loading = true;
       state.error = null;
-      state.data = data;
+      state.data = null;
+    },
+    fetchDataQuestionRequest: (state, { payload: data }) => {
+      state.loading = true;
+      state.error = null;
+      state.dataFaq = null;
+      state.dataRel = null;
+      state.dataSyn = null;
     },
     fetchDataSuccess: (state, { payload: data }) => {
       state.loading = false;
       state.data = data;
+    },
+    fetchDataFaqSuccess: (state, { payload: data }) => {
+      state.loading = false;
+      state.dataFaq = data;
+      state.dataType = "dataFaq";
+    },
+    fetchDataRelSuccess: (state, { payload: data }) => {
+      state.loading = false;
+      state.dataRel = data;
+      state.dataType = "dataRel";
+    },
+    fetchDataSynSuccess: (state, { payload: data }) => {
+      state.loading = false;
+      state.dataSyn = data;
+      state.dataType = "dataSyn";
     },
     fetchDataFailure: (state, action) => {
       state.loading = false;
@@ -33,49 +60,47 @@ const tagsBrowser = createSlice({
     },
     setOrder: (state, { payload: newOrder }) => {
       state.order = newOrder;
-      // console.log("order", state.order);
     },
     setSort: (state, { payload: newSort }) => {
       state.sort = newSort;
-      // console.log("sort", state.sort);
     },
     setPage: (state, { payload: newPage }) => {
       state.page = newPage;
-      // console.log("page", state.page);
     },
     setPageSize: (state, { payload: newPageSize }) => {
       state.pageSize = newPageSize;
-      // console.log("pageSize", state.pageSize);
     },
     setMin: (state, { payload: newMin }) => {
       state.min = newMin;
-      // console.log("min", state.min);
     },
     setMax: (state, { payload: newMax }) => {
       state.max = newMax;
-      // console.log("max", state.max);
     },
     setInname: (state, { payload: newInname }) => {
       state.inname = newInname;
-      // console.log("inname", state.inname);
     },
     setDateFrom: (state, { payload: newDateFrom }) => {
       state.dateFrom = newDateFrom;
-      // console.log("dateFrom", state.dateFrom);
     },
     setDateTo: (state, { payload: newDateTo }) => {
       state.dateTo = newDateTo;
-      // console.log("dateTo", state.dateTo);
     },
     setSelectedTag: (state, { payload: newTag }) => {
       state.selectedTag = newTag;
+    },
+    setShowMenu: (state) => {
+      state.showMenu = !state.showMenu;
     },
   },
 });
 
 export const {
   fetchDataRequest,
+  fetchDataQuestionRequest,
   fetchDataSuccess,
+  fetchDataFaqSuccess,
+  fetchDataRelSuccess,
+  fetchDataSynSuccess,
   fetchDataFailure,
   setOrder,
   setSort,
@@ -87,11 +112,16 @@ export const {
   setDateFrom,
   setDateTo,
   setSelectedTag,
+  setShowMenu,
 } = tagsBrowser.actions;
 
 export const selectTagsBrowserState = (state) => state.tagsBrowser;
 export const selectTagsBrowserData = (state) =>
   selectTagsBrowserState(state).data;
+export const selectTagsBrowserLoading = (state) =>
+  selectTagsBrowserState(state).loading;
+export const selectTagsBrowserError = (state) =>
+  selectTagsBrowserState(state).error;
 export const selectTagsBrowserOrder = (state) =>
   selectTagsBrowserState(state).order;
 export const selectTagsBrowserSort = (state) =>
@@ -112,5 +142,15 @@ export const selectTagsBrowserDateTo = (state) =>
   selectTagsBrowserState(state).dateTo;
 export const selectTagsBrowserSelectedTag = (state) =>
   selectTagsBrowserState(state).selectedTag;
+export const selectTagsBrowserDataFaq = (state) =>
+  selectTagsBrowserState(state).dataFaq;
+export const selectTagsBrowserDataRel = (state) =>
+  selectTagsBrowserState(state).dataRel;
+export const selectTagsBrowserDataSyn = (state) =>
+  selectTagsBrowserState(state).dataSyn;
+export const selectTagsBrowserDataType = (state) =>
+  selectTagsBrowserState(state).dataType;
+export const selectTagsBrowserShowMenu = (state) =>
+  selectTagsBrowserState(state).showMenu;
 
 export default tagsBrowser.reducer;
