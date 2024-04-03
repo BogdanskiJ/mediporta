@@ -1,6 +1,15 @@
 import axios from "axios";
+
 import { urlPrefix, urlSufix } from "./links";
-import { fetchDataFailure, fetchDataRequest, fetchDataSuccess } from "./slice";
+import {
+  fetchDataFailure,
+  fetchDataFaqSuccess,
+  fetchDataQuestionRequest,
+  fetchDataRelSuccess,
+  fetchDataRequest,
+  fetchDataSuccess,
+  fetchDataSynSuccess,
+} from "./slice";
 
 export const fetchDataTags = ({
   page,
@@ -51,47 +60,45 @@ export const fetchDataTags = ({
   };
 };
 
-export const fetchDataTagQuestions = ({ tag }) => {
+export const fetchDataTagQuestions = (tag) => {
   const link = `${urlPrefix}/${tag}/faq?${urlSufix}`;
-
-  console.log(link, "link w quest");
 
   return async (dispatch) => {
     try {
-      dispatch(fetchDataRequest());
+      dispatch(fetchDataQuestionRequest());
       const response = await axios.get(link);
       const data = response.data;
-      dispatch(fetchDataSuccess(data));
+      dispatch(fetchDataFaqSuccess(data));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
   };
 };
 
-export const fetchDataTagRelated = ({ tag }) => {
+export const fetchDataTagRelated = (tag) => {
   const link = `${urlPrefix}/${tag}/related?${urlSufix}`;
 
   return async (dispatch) => {
     try {
-      dispatch(fetchDataRequest());
+      dispatch(fetchDataQuestionRequest());
       const response = await axios.get(link);
       const data = response.data;
-      dispatch(fetchDataSuccess(data));
+      dispatch(fetchDataRelSuccess(data));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
   };
 };
 
-export const fetchDataTagSynonyms = ({ tag }) => {
+export const fetchDataTagSynonyms = (tag) => {
   const link = `${urlPrefix}/${tag}/synonyms?order=desc&sort=applied&${urlSufix}`;
 
   return async (dispatch) => {
     try {
-      dispatch(fetchDataRequest());
+      dispatch(fetchDataQuestionRequest());
       const response = await axios.get(link);
       const data = response.data;
-      dispatch(fetchDataSuccess(data));
+      dispatch(fetchDataSynSuccess(data));
     } catch (error) {
       dispatch(fetchDataFailure(error.message));
     }
