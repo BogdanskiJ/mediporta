@@ -1,8 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
-import { ThemeProvider } from "@mui/material/styles";
-
+import { ThemeProvider } from "styled-components";
+import { Normalize } from "styled-normalize";
+import { GlobalStyle } from "./GlobalStyle";
 import "./index.css";
 import App from "./App";
 import store from "./store";
@@ -14,6 +15,8 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
+        <Normalize />
+        <GlobalStyle />
         <App />
       </ThemeProvider>
     </Provider>
