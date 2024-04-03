@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
-import "dayjs/locale/pl";
 import { useDispatch, useSelector } from "react-redux";
+import { debounce } from "lodash";
+import { useCallback } from "react";
+import { fetchDataTags } from "../../../getData";
 import {
   selectTagsBrowserDateFrom,
   selectTagsBrowserDateTo,
@@ -10,13 +11,13 @@ import {
   selectTagsBrowserOrder,
   selectTagsBrowserPage,
   selectTagsBrowserPageSize,
-  selectTagsBrowserShowMenu,
   selectTagsBrowserSort,
-} from "../../slice";
-import { fetchDataTags } from "../../getData";
-import { RequestOptionsContainer } from "./requestOptionsContainer";
+  setSelectedTag,
+  setShowMenu,
+} from "../../../slice";
+import { SearchBoxContainer } from "./searchBoxContainer";
 
-export const RequestOptions = () => {
+export const SearchBox = () => {
   const dispatch = useDispatch();
 
   const order = useSelector(selectTagsBrowserOrder);
@@ -28,23 +29,29 @@ export const RequestOptions = () => {
   const inname = useSelector(selectTagsBrowserInname);
   const dateFrom = useSelector(selectTagsBrowserDateFrom);
   const dateTo = useSelector(selectTagsBrowserDateTo);
-  const showMenu = useSelector(selectTagsBrowserShowMenu);
 
-  useEffect(() => {
-    dispatch(
-      fetchDataTags({
-        page,
-        pageSize,
-        dateFrom,
-        dateTo,
-        order,
-        min,
-        max,
-        sort,
-        inname,
-      })
-    );
-  }, []);
+  const debouncedFetchDataTags = useCallback(
+    debounce((params) => {
+      dispatch(fetchDataTags(params));
+    }, 1000),
+    []
+  );
 
-  return <RequestOptionsContainer $showMenu={showMenu} />;
+  const $handleClick = () => {
+    debouncedFetchDataTags({
+      page,
+      pageSize,
+      dateFrom,
+      dateTo,
+      order,
+      min,
+      max,
+      sort,
+      inname,
+    });
+    dispatch(setShowMenu());
+    dispatch(setSelectedTag(null));
+  };
+
+  return <SearchBoxContainer $handleClick={$handleClick} />;
 };
