@@ -12,24 +12,17 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
-import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   selectTagsBrowserData,
   selectTagsBrowserSelectedTag,
   setSelectedTag,
 } from "../../slice";
-import { nanoid } from "@reduxjs/toolkit";
 
-import "../../App.css";
+import { nanoid } from "@reduxjs/toolkit";
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -47,10 +40,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort(array, comparator) {
   const stabilizedThis = array.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -68,25 +57,18 @@ const headCells = [
     id: "name",
     numeric: false,
     disablePadding: true,
-    label: "Tag",
+    label: "Tag name",
   },
   {
     id: "count",
     numeric: true,
     disablePadding: false,
-    label: "Count",
+    label: "Related posts",
   },
 ];
 
 function EnhancedTableHead(props) {
-  const {
-    onSelectAllClick,
-    order,
-    orderBy,
-    numSelected,
-    rowCount,
-    onRequestSort,
-  } = props;
+  const { order, orderBy, onRequestSort } = props;
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
@@ -94,7 +76,6 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox"></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -122,23 +103,19 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
-  onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
 
-function EnhancedTableToolbar(props) {
-  const { numSelected } = props;
-
+function EnhancedTableToolbar({ selectedTag }) {
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
+        ...(selectedTag > 0 && {
           bgcolor: (theme) =>
             alpha(
               theme.palette.primary.main,
@@ -147,46 +124,17 @@ function EnhancedTableToolbar(props) {
         }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          variant="h6"
-          id="tableTitle"
-          component="div"
-        >
-          Tags Browser
-        </Typography>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Delete">
-          <IconButton>
-            <DeleteIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+      <Typography
+        sx={{ flex: "1 1 100%" }}
+        variant="h6"
+        id="tableTitle"
+        component="div"
+      >
+        Tags Browser{`${selectedTag ? ` - ${selectedTag}  ` : ""}`}
+      </Typography>
     </Toolbar>
   );
 }
-
-EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
-};
 
 export default function EnhancedTable() {
   const dispatch = useDispatch();
@@ -194,7 +142,6 @@ export default function EnhancedTable() {
   const [orderBy, setOrderBy] = useState("tagCount");
   const [selected, setSelected] = useState("");
   const [page, setPage] = useState(0);
-  const [dense, setDense] = useState(true);
   const [rowsPerPage, setRowsPerPage] = useState(25);
 
   const selectedTag = useSelector(selectTagsBrowserSelectedTag);
@@ -216,31 +163,11 @@ export default function EnhancedTable() {
     }
     setSelected([]);
   };
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const handleClick = (event, id, name) => {
     selectedTag === name
       ? dispatch(setSelectedTag(""))
       : dispatch(setSelectedTag(name));
-
-    setIsExpanded(!isExpanded);
-    console.log(name, selectedTag, "name", "selectedTag");
-    // const selectedIndex = selected.indexOf(id);
-    // let newSelected = "";
-
-    // if (selected === "") {
-    //   setSelected(name);
-    //   console.log(name, "name");
-    // }
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name);
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1)
-    //   );
-    // }
-    // setSelected(newSelected);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -252,131 +179,75 @@ export default function EnhancedTable() {
     setPage(0);
   };
 
-  const handleChangeDense = (event) => {
-    setDense(event.target.checked);
-  };
-
-  const isSelected = (id) => selected.indexOf(id) !== -1;
+  const isSelected = (name) => name === selectedTag;
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.items.length) : 0;
+    rows && rows.items && rows.items.length > 0
+      ? Math.max(0, (1 + page) * rowsPerPage - rows.items.length)
+      : 0;
 
-  const visibleRows = useMemo(
-    () =>
-      stableSort(rows.items, getComparator(order, orderBy)).slice(
+  const visibleRows = useMemo(() => {
+    if (rows && rows.items && rows.items.length > 0) {
+      return stableSort(rows.items, getComparator(order, orderBy)).slice(
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage
-      ),
-    [order, orderBy, page, rowsPerPage]
-  );
+      );
+    }
+    return [];
+  }, [order, orderBy, page, rowsPerPage]);
 
   return (
     <Box sx={{ width: "100%" }}>
-      <Paper sx={{ width: "100%", mb: 2, overflow: "hidden" }}>
-        <EnhancedTableToolbar numSelected={selected.name} />
-        <TableContainer sx={{ maxHeight: 440 }}>
+      <Paper sx={{ width: "100%", overflow: "hidden", padding: "10px" }}>
+        <EnhancedTableToolbar selectedTag={selectedTag} />
+        <TableContainer sx={{ maxHeight: "70vh" }}>
           <Table
-            sx={{ minWidth: 750 }}
             stickyHeader
             aria-label="sticky table"
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
+            size={"small"}
           >
             <EnhancedTableHead
-              numSelected={selected.length}
+              numSelected={selectedTag}
               order={order}
               orderBy={orderBy}
-              onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={rows.items.length}
+              rowCount={rows && rows.items ? rows.items.length : 0}
             />
             <TableBody>
               {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id);
+                const isItemSelected = isSelected(row.name);
                 const labelId = `enhanced-table-checkbox-${index}`;
 
                 return (
-                  <>
-                    <TableRow
-                      className="tableRow"
-                      hover
-                      onClick={(event) => handleClick(event, row.id, row.name)}
-                      role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={nanoid()}
-                      selected={isItemSelected}
-                      sx={{ cursor: "pointer" }}
+                  <TableRow
+                    className="tableRow"
+                    hover
+                    onClick={(event) => handleClick(event, row.id, row.name)}
+                    role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={nanoid()}
+                    selected={isItemSelected}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    <TableCell
+                      component="th"
+                      id={labelId}
+                      scope="row"
+                      padding="none"
                     >
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            "aria-labelledby": labelId,
-                          }}
-                        />
-                      </TableCell>
-                      <TableCell
-                        component="th"
-                        id={labelId}
-                        scope="row"
-                        padding="none"
-                      >
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="right">{row.count}</TableCell>
-                    </TableRow>
-                    {row.name === selectedTag && (
-                      <TableRow className="tableRowExpanded">
-                        <TableCell colSpan={6}>
-                          <div className="tableRowExpanded__outerBox">
-                            <div className="tableRowExpanded__buttonsBox">
-                              <button>1</button>
-                              <button>12</button>
-                              <button>13</button>
-                            </div>
-                            <div className="tableRowExpanded__data">
-                              <div>
-                                Jakikolwiek tekst czy cokolwiek tam innego tekst
-                                czy cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego tekst czy cokolwiek tam innego tekst czy
-                                cokolwiek tam innego tekst czy cokolwiek tam
-                                innego{" "}
-                              </div>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
+                      {row.name}
+                    </TableCell>
+                    <TableCell align="right">{row.count}</TableCell>
+                  </TableRow>
                 );
               })}
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: (dense ? 33 : 53) * emptyRows,
+                    height: 40 * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />
@@ -388,17 +259,13 @@ export default function EnhancedTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={rows.items.length}
+          count={rows && rows.items ? rows.items.length : 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
     </Box>
   );
 }
