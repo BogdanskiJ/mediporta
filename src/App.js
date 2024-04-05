@@ -19,7 +19,7 @@ function App() {
       <RequestOptions />
       <StyledDataBoxes>
         {loading ? (
-          <LoadingPage />
+          <LoadingPage color={"primary"} />
         ) : error ? (
           <ErrorPage />
         ) : (

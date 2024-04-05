@@ -1,6 +1,6 @@
 import { Box, CircularProgress, Paper } from "@mui/material";
 
-export const LoadingPage = () => {
+export const LoadingPage = ({ color }) => {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper
@@ -12,6 +12,7 @@ export const LoadingPage = () => {
         }}
       >
         <CircularProgress
+          color={color}
           sx={{
             width: "100%",
             height: "100%",
@@ -27,4 +28,8 @@ export const LoadingPage = () => {
       </Paper>
     </Box>
   );
+};
+
+LoadingPage.defaultProps = {
+  color: "primary", // domyślny kolor ikony ładowania
 };
